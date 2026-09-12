@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+neo4j
+python-dotenv
+requests
+pydantic
+daytona
+pytest
