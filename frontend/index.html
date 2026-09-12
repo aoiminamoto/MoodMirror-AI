@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoodMirror AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(194, 182, 255, 0.28), transparent 36%),
+        radial-gradient(circle at bottom right, rgba(255, 208, 224, 0.22), transparent 34%),
+        #f7f7fb;
+      color: #1f1f2d;
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 72px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(60,60,90,0.08);
+      box-shadow: 0 8px 30px rgba(40, 35, 70, 0.06);
+      font-size: 13px;
+      color: #6f6b87;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 7vw, 72px);
+      letter-spacing: -0.05em;
+      line-height: 0.98;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #665cff, #b85cff, #ff7aa8);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      max-width: 700px;
+      margin: 18px auto 0;
+      color: #77748a;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(60,60,90,0.08);
+      box-shadow: 0 20px 60px rgba(38, 32, 72, 0.08);
+      border-radius: 28px;
+      padding: 26px;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #8a8799;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 250px;
+      resize: vertical;
+      border: 1px solid #e8e6f2;
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+      outline: none;
+      background: #ffffff;
+      color: #29273a;
+    }
+
+    textarea:focus {
+      border-color: #a599ff;
+      box-shadow: 0 0 0 4px rgba(127, 110, 255, 0.08);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      align-items: center;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .primary {
+      flex: 1;
+      color: white;
+      background: linear-gradient(90deg, #6d5dfc, #9c5df5, #ef72a4);
+      box-shadow: 0 10px 30px rgba(111, 87, 255, 0.25);
+    }
+
+    .secondary {
+      background: #f0eff6;
+      color: #676377;
+    }
+
+    .mini-note {
+      color: #9b98a8;
+      font-size: 12px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #77748a;
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .result-head h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #f0efff;
+      color: #6a5ee8;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      background: #fff;
+      border: 1px solid #efedf5;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .metric .name {
+      font-size: 12px;
+      color: #8e8b9d;
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .baseline {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid #eceaf2;
+    }
+
+    .baseline h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0eef4;
+      font-size: 14px;
+    }
+
+    .delta-up {
+      color: #2f9d70;
+      font-weight: 700;
+    }
+
+    .delta-down {
+      color: #d45f7d;
+      font-weight: 700;
+    }
+
+    .delta-flat {
+      color: #898595;
+      font-weight: 700;
+    }
+
+    .insight {
+      margin-top: 16px;
+      border-radius: 18px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f4f1ff, #fff3f7);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #5f5a73;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      color: #aaa7b3;
+      font-size: 12px;
+    }
+
+    @media (max-width: 820px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .shell {
+        padding-top: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="badge">Tokyo Hackathon · MoodMirror AI</div>
+
+      <h1>
+        Your Words.<br />
+        <span class="gradient-text">Your Patterns. Over Time.</span>
+      </h1>
+
+      <p class="subtitle">
+        MoodMirror analyzes how your writing changes over time and compares each new entry
+        with your own personal baseline — not with everyone else.
+      </p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <div class="label">Write naturally</div>
+
+        <textarea id="textInput"
+          placeholder="Write about your day, goals, worries, plans, or anything on your mind..."></textarea>
+
+        <div class="button-row">
+          <button class="secondary" onclick="fillExample()">Use example</button>
+          <button class="primary" onclick="analyze()">Analyze My Writing</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="mini-note">
+          MoodMirror is designed for reflection and pattern tracking.
+          It does not provide medical or mental-health diagnosis.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="result-head">
+          <h2>Your Mirror</h2>
+          <div id="enginePill" class="pill">Waiting for analysis</div>
+        </div>
+
+        <div id="metricGrid" class="metric-grid">
+          <div class="metric">
+            <div class="name">Future Orientation</div>
+            <div class="value">—</div>
+          </div>
+
+          <div class="metric">
+            <div class="name">Action Orientation</div>
+            <div class="value">—</div>
+          </div>
+
+          <div class="metric">
+            <div class="name">Lexical Diversity</div>
+            <div class="value">—</div>
+          </div>
+
+          <div class="metric">
+            <div class="name">Uncertainty</div>
+            <div class="value">—</div>
+          </div>
+        </div>
+
+        <div class="baseline">
+          <h3>Compared with your baseline</h3>
+          <div id="comparison">
+            <div class="mini-note">
+              Your personal baseline appears after you build writing history.
+            </div>
+          </div>
+        </div>
+
+        <div id="insight" class="insight">
+          Write something and MoodMirror will surface a concise pattern summary here.
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Daytona-powered analysis · Longitudinal baseline · MoodMirror AI
+    </div>
+  </main>
+
+  <script>
+    function fillExample() {
+      document.getElementById("textInput").value =
+        "I feel more confident today. I will build my project, prepare carefully, and move forward with a clear plan.";
+    }
+
+    function pct(value) {
+      if (value === null || value === undefined) return "—";
+      return Math.round(value * 100) + "%";
+    }
+
+    function formatMetricName(name) {
+      return name
+        .replaceAll("_", " ")
+        .replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    function buildInsight(features, comparisons) {
+      const parts = [];
+
+      if ((features.future_orientation || 0) > 0.10) {
+        parts.push("Your writing is strongly future-oriented.");
+      }
+
+      if ((features.action_orientation || 0) > 0.10) {
+        parts.push("Action-focused language is prominent.");
+      }
+
+      if ((features.uncertainty || 0) < 0.05) {
+        parts.push("Uncertainty language is relatively low in this entry.");
+      }
+
+      if (comparisons && comparisons.length) {
+        const future = comparisons.find(x => x.metric === "future_orientation");
+        const action = comparisons.find(x => x.metric === "action_orientation");
+
+        if (future && future.percent_change !== null && future.percent_change > 10) {
+          parts.push("Future-oriented language is higher than your personal baseline.");
+        }
+
+        if (action && action.percent_change !== null && action.percent_change > 10) {
+          parts.push("Action-oriented language is also above your recent baseline.");
+        }
+      }
+
+      return parts.length
+        ? parts.join(" ")
+        : "This entry is close to your recent writing baseline.";
+    }
+
+    async function analyze() {
+      const text = document.getElementById("textInput").value.trim();
+      const status = document.getElementById("status");
+
+      if (!text) {
+        status.textContent = "Please write something first.";
+        return;
+      }
+
+      status.textContent = "Analyzing inside Daytona sandbox...";
+
+      try {
+        const response = await fetch("/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: "demo-user",
+            text: text
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        const data = await response.json();
+        const f = data.features || {};
+
+        document.getElementById("enginePill").textContent =
+          data.analysis_engine || "Daytona Sandbox";
+
+        document.getElementById("metricGrid").innerHTML = `
+          <div class="metric">
+            <div class="name">Future Orientation</div>
+            <div class="value">${pct(f.future_orientation)}</div>
+          </div>
+
+          <div class="metric">
+            <div class="name">Action Orientation</div>
+            <div class="value">${pct(f.action_orientation)}</div>
+          </div>
+
+          <div class="metric">
+            <div class="name">Lexical Diversity</div>
+            <div class="value">${pct(f.lexical_diversity)}</div>
+          </div>
+
+          <div class="metric">
+            <div class="name">Uncertainty</div>
+            <div class="value">${pct(f.uncertainty)}</div>
+          </div>
+        `;
+
+        const comparisons = data.baseline_comparison || [];
+        const comparisonBox = document.getElementById("comparison");
+
+        if (!comparisons.length) {
+          comparisonBox.innerHTML = `
+            <div class="mini-note">
+              This entry is building your personal baseline. Add another entry to compare changes over time.
+            </div>
+          `;
+        } else {
+          const important = comparisons.filter(item =>
+            [
+              "future_orientation",
+              "action_orientation",
+              "lexical_diversity",
+              "uncertainty"
+            ].includes(item.metric)
+          );
+
+          comparisonBox.innerHTML = important.map(item => {
+            let deltaText = "No change";
+            let cls = "delta-flat";
+
+            if (item.percent_change !== null) {
+              if (item.percent_change > 0) {
+                deltaText = `+${item.percent_change}%`;
+                cls = "delta-up";
+              } else if (item.percent_change < 0) {
+                deltaText = `${item.percent_change}%`;
+                cls = "delta-down";
+              } else {
+                deltaText = "0%";
+              }
+            } else {
+              deltaText = "New";
+            }
+
+            return `
+              <div class="comparison-row">
+                <span>${formatMetricName(item.metric)}</span>
+                <span class="${cls}">${deltaText}</span>
+              </div>
+            `;
+          }).join("");
+        }
+
+        document.getElementById("insight").textContent =
+          buildInsight(f, comparisons);
+
+        status.textContent =
+          `Analysis complete · ${data.history_count_before_this_entry ?? 0} prior entries in baseline`;
+
+      } catch (error) {
+        console.error(error);
+        status.textContent = "Analysis failed. Check that the backend server is running.";
+      }
+    }
+  </script>
+</body>
+</html>
