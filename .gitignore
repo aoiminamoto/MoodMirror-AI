@@ -18,3 +18,5 @@ venv/
 # Generated artifacts
 *.log
 outputs/
+moodmirror.db
+*.db
